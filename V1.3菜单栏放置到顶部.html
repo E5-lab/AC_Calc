@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AcoustiCompute™ - 专业声学工程计算平台</title>
+    <style>
+        /* 核心“高活力科技蓝橘”调色盘 */
+        :root {
+            --color-nav-primary: #111827;    /* 一级导航：太空深邃蓝灰 */
+            --color-nav-secondary: #FFFFFF;  /* 二级导航：纯白 */
+            --color-bg: #F8FAFC;             /* 纯净工作区底色 */
+            --color-card: #FFFFFF;           /* 白色悬浮卡片 */
+            --color-border: #E2E8F0;         /* 现代化极细分割线 */
+            
+            /* 活力核心色彩 */
+            --color-brand: #0D6EFD;          /* 活力科技蓝（主品牌色） */
+            --color-brand-hover: #0A58CA;    /* 悬浮深蓝 */
+            --color-brand-light: #F0F6FF;    /* 极淡科技蓝（高亮背景） */
+            --color-accent: #FF6B35;         /* 极客能量橘（高亮图示/核心结果） */
+            
+            --color-text-main: #1E293B;      /* 现代深蓝灰主文字 */
+            --color-text-muted: #64748B;     /* 次要灰色文字 */
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 12px -1px rgba(15,23,42,0.04), 0 2px 6px -1px rgba(15,23,42,0.02);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+        }
+
+        body {
+            background-color: var(--color-bg);
+            color: var(--color-text-main);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ================= 💳 顶部双层菜单系统 ================= */
+        
+        /* 一级导航栏 */
+        .top-navbar-primary {
+            height: 56px;
+            background-color: var(--color-nav-primary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            z-index: 10;
+        }
+
+        .brand-logo {
+            font-size: 18px;
+            font-weight: 800;
+            color: #FFFFFF;
+            letter-spacing: 0.5px;
+        }
+
+        .brand-logo span {
+            color: var(--color-accent);
+        }
+
+        .nav-menu-primary {
+            display: flex;
+            gap: 5px;
+            height: 100%;
+        }
+
+        .nav-item-primary {
+            color: #9CA3AF;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            height: 100%;
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav-item-primary:hover {
+            color: #FFFFFF;
+        }
+
+        .nav-item-primary.active {
+            color: #FFFFFF;
+            border-bottom-color: var(--color-brand);
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        /* 二级导航栏 */
+        .top-navbar-secondary {
+            height: 48px;
+            background-color: var(--color-nav-secondary);
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            padding: 0 30px;
+            box-shadow: var(--shadow-sm);
+            z-index: 9;
+        }
+
+        .nav-menu-secondary {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-item-secondary {
+            color: var(--color-text-muted);
+            font-size: 13px;
+            font-weight: 600;
+            padding: 6px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-item-secondary:hover:not(.disabled) {
+            color: var(--color-brand);
+            background-color: #F1F5F9;
+        }
+
+        .nav-item-secondary.active {
+            color: var(--color-brand);
+            background-color: var(--color-brand-light);
+        }
+
+        .nav-item-secondary.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .nav-item-secondary .tag {
+            font-size: 9px;
+            background: #E2E8F0;
+            color: var(--color-text-muted);
+            padding: 1px 4px;
+            border-radius: 3px;
+            font-weight: 700;
+        }
+
+        /* ================= 🖥️ 全屏主工作区 ================= */
+        .workspace {
+            flex: 1;
+            padding: 25px 30px;
+            overflow-y: auto;
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr; /* 宽屏下更舒展的黄金分割 */
+            gap: 25px;
+            align-items: start;
+            max-width: 1400px;
+            margin: 0 auto; /* 宽屏下居中对齐，更显国际化 */
+        }
+
+        /* 卡片构建 */
+        .panel-card {
+            background: var(--color-card);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--color-border);
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--color-text-main);
+            background-color: #F8FAFC;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .panel-body {
+            padding: 20px;
+        }
+
+        .visual-card {
+            height: 540px;
+        }
+
+        canvas {
+            width: 100%;
+            height: calc(100% - 10px);
+            background: #FFFFFF;
+        }
+
+        .right-flow {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* 输入参数表单 */
+        .input-row {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--color-text-main);
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            font-size: 14px;
+            color: var(--color-text-main);
+            background-color: #FFFFFF;
+            transition: all 0.15s ease-in-out;
+        }
+
+        .input-group input:focus {
+            border-color: var(--color-brand);
+            box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.12);
+            outline: none;
+        }
+
+        /* 排布卡片单选组 */
+        .radio-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .radio-item {
+            display: flex;
+            align-items: center;
+            padding: 14px;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .radio-item:hover {
+            background-color: #F8FAFC;
+            border-color: #CBD5E1;
+        }
+
+        .radio-item.selected-card {
+            border-color: var(--color-brand);
+            background-color: var(--color-brand-light);
+        }
+
+        .radio-item input[type="radio"] {
+            margin-right: 12px;
+            accent-color: var(--color-brand);
+            width: 16px;
+            height: 16px;
+        }
+
+        .radio-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .radio-title {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .radio-desc {
+            font-size: 12px;
+            color: var(--color-text-muted);
+        }
+
+        /* 计算激活栏 */
+        .action-bar {
+            border-top: 1px solid var(--color-border);
+            padding-top: 20px;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        button {
+            background-color: var(--color-brand);
+            color: white;
+            border: none;
+            padding: 11px 26px;
+            font-size: 14px;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.2);
+            transition: all 0.2s ease-in-out;
+        }
+
+        button:hover {
+            background-color: var(--color-brand-hover);
+            box-shadow: 0 6px 16px rgba(13, 110, 253, 0.3);
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .result-display {
+            background-color: #0F172A;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-align: right;
+            box-shadow: 0 4px 12px rgba(15,23,42,0.08);
+            min-width: 140px;
+        }
+
+        .result-title {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: #94A3B8;
+            font-weight: 700;
+            margin-bottom: 2px;
+            letter-spacing: 0.5px;
+        }
+
+        .result-value {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--color-accent);
+            text-shadow: 0 0 10px rgba(255,107,53,0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-navbar-primary">
+        <div class="nav-menu-primary">
+            <div class="nav-item-primary active" onclick="switchPrimaryMenu('materials', this)">材料声学计算</div>
+            <div class="nav-item-primary" onclick="switchPrimaryMenu('building', this)">建筑声学模拟</div>
+            <div class="nav-item-primary" onclick="switchPrimaryMenu('env', this)">环境噪声控制</div>
+        </div>
+        <div class="brand-logo">
+            Acousti<span>Compute™</span>
+        </div>
+    </div>
+
+    <div class="top-navbar-secondary">
+        <div class="nav-menu-secondary" id="secondaryNavContainer">
+            </div>
+    </div>
+
+    <div class="workspace">
+        <div class="grid-layout">
+            
+            <div class="panel-card visual-card">
+                <div class="panel-header">工程尺寸标注与排布矢量图纸</div>
+                <div class="panel-body" style="flex:1;">
+                    <canvas id="diagramCanvas"></canvas>
+                </div>
+            </div>
+
+            <div class="right-flow">
+                
+                <div class="panel-card">
+                    <div class="panel-header">设计参数键入 (Design Parameters)</div>
+                    <div class="panel-body">
+                        <div id="dynamicInputs" class="input-row"></div>
+                    </div>
+                </div>
+
+                <div class="panel-card">
+                    <div class="panel-header">阵列排布形制 (Array Patterns)</div>
+                    <div class="panel-body">
+                        <div class="radio-stack" id="radioStack">
+                            <label class="radio-item selected-card">
+                                <input type="radio" name="pattern" value="Square" checked onchange="switchPattern()">
+                                <div class="radio-info">
+                                    <div class="radio-title">正方形对称阵列 (Square Matrix)</div>
+                                    <div class="radio-desc">孔眼行列垂直正交对齐排布</div>
+                                </div>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="pattern" value="DiamondSquare" onchange="switchPattern()">
+                                <div class="radio-info">
+                                    <div class="radio-title">45° 菱形等边对角错排 (Staggered 45°)</div>
+                                    <div class="radio-desc">空间利用率高的三角形梅花排布</div>
+                                </div>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="pattern" value="DiamondRectangle" onchange="switchPattern()">
+                                <div class="radio-info">
+                                    <div class="radio-title">矩形非等边交错对角错排 (Staggered Rect)</div>
+                                    <div class="radio-desc">横向与纵向中心距不同的交错阵列</div>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="action-bar">
+                            <button onclick="calculate()">执行数据计算</button>
+                            <div class="result-display">
+                                <div class="result-title">穿孔率结果 (Ratio)</div>
+                                <div class="result-value" id="resultLabel">0.00 %</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+<script>
+    const canvas = document.getElementById('diagramCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // 二级菜单的数据池源
+    const menuData = {
+        materials: [
+            { id: 'perforation', name: '金属微穿孔率计算', active: true },
+            { id: 'impedance', name: '多孔吸音材料阻抗', active: false, disabled: true, tag: '开发中' }
+        ],
+        building: [
+            { id: 'rt60', name: '室内混响时间 (RT60)', active: false, disabled: true, tag: '开发中' },
+            { id: 'stc', name: '墙体隔音量 (STC)', active: false, disabled: true, tag: '开发中' }
+        ],
+        env: [
+            { id: 'barrier', name: '声屏障衰减计算', active: false, disabled: true, tag: '开发中' }
+        ]
+    };
+
+    // 渲染二级菜单的方法
+    function renderSecondaryMenu(category) {
+        const container = document.getElementById('secondaryNavContainer');
+        container.innerHTML = '';
+        
+        menuData[category].forEach(item => {
+            const div = document.createElement('div');
+            div.className = `nav-item-secondary ${item.active ? 'active' : ''} ${item.disabled ? 'disabled' : ''}`;
+            div.innerHTML = item.name;
+            if (item.tag) {
+                div.innerHTML += ` <span class="tag">${item.tag}</span>`;
+            }
+            container.appendChild(div);
+        });
+    }
+
+    // 点击一级菜单切换逻辑
+    function switchPrimaryMenu(category, element) {
+        document.querySelectorAll('.nav-item-primary').forEach(el => el.classList.remove('active'));
+        element.classList.add('active');
+        renderSecondaryMenu(category);
+    }
+
+    function resizeCanvas() {
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * window.devicePixelRatio;
+        canvas.height = rect.height * window.devicePixelRatio;
+        ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        drawDiagram();
+    }
+
+    function updateFields(mode) {
+        const container = document.getElementById('dynamicInputs');
+        container.innerHTML = '';
+
+        if (mode === 'Square' || mode === 'DiamondSquare') {
+            container.innerHTML = `
+                <div class="input-group">
+                    <label>微孔直径 d (mm)</label>
+                    <input type="number" id="input_d" value="5" step="any">
+                </div>
+                <div class="input-group">
+                    <label>阵列中心距 P (mm)</label>
+                    <input type="number" id="input_P" value="10" step="any">
+                </div>
+            `;
+        } else if (mode === 'DiamondRectangle') {
+            container.innerHTML = `
+                <div class="input-group">
+                    <label>微孔直径 d (mm)</label>
+                    <input type="number" id="input_d" value="5" step="any">
+                </div>
+                <div class="input-group">
+                    <label>横向同排中心距 P1 (mm)</label>
+                    <input type="number" id="input_P1" value="10" step="any">
+                </div>
+                <div class="input-group">
+                    <label>纵向跨行轴线距 P2 (mm)</label>
+                    <input type="number" id="input_P2" value="12" step="any">
+                </div>
+            `;
+        }
+    }
+
+    function getSelectedPattern() {
+        return document.querySelector('input[name="pattern"]:checked').value;
+    }
+
+    function updateRadioCardStyle() {
+        document.querySelectorAll('.radio-item').forEach(item => {
+            const radio = item.querySelector('input[type="radio"]');
+            if (radio.checked) {
+                item.classList.add('selected-card');
+            } else {
+                item.classList.remove('selected-card');
+            }
+        });
+    }
+
+    function switchPattern() {
+        updateFields(getSelectedPattern());
+        updateRadioCardStyle();
+        document.getElementById('resultLabel').innerText = "0.00 %";
+        drawDiagram();
+    }
+
+    function drawDiagram() {
+        const mode = getSelectedPattern();
+        const w = canvas.getBoundingClientRect().width;
+        const h = canvas.getBoundingClientRect().height;
+        ctx.clearRect(0, 0, w, h);
+        
+        const circleFill = "#F0F6FF";  
+        const circleLine = "#0D6EFD";  
+        const lineMuted = "#64748B";   
+        const accentArrow = "#FF6B35"; 
+
+        function drawArrow(x1, y1, x2, y2, color) {
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1.5;
+            ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+            ctx.fillStyle = color;
+            [ [x1, y1, x2, y2], [x2, y2, x1, y1] ].forEach(([ax, ay, bx, by]) => {
+                const angle = Math.atan2(by - ay, bx - ax);
+                ctx.beginPath(); ctx.moveTo(ax, ay);
+                ctx.lineTo(ax + 5 * Math.cos(angle + Math.PI/6), ay + 5 * Math.sin(angle + Math.PI/6));
+                ctx.lineTo(ax + 5 * Math.cos(angle - Math.PI/6), ay + 5 * Math.sin(angle - Math.PI/6));
+                ctx.fill();
+            });
+        }
+
+        ctx.font = "700 12px -apple-system, BlinkMacSystemFont, Segoe UI";
+
+        // 动态适配 Canvas 的图形大小定位
+        const startX = w * 0.25;
+        const startY = h * 0.25;
+        const gapX = 140;
+        const gapY = 140;
+
+        if (mode === 'Square') {
+            const r = 26;
+            const coords = [[startX, startY], [startX + gapX, startY], [startX, startY + gapY], [startX + gapX, startY + gapY]];
+            coords.forEach(([cx, cy]) => {
+                ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+                ctx.fillStyle = circleFill; ctx.fill();
+                ctx.strokeStyle = circleLine; ctx.lineWidth = 1.5; ctx.stroke();
+            });
+            drawArrow(startX - 26, startY, startX + 26, startY, accentArrow);
+            ctx.fillStyle = "#1E293B"; ctx.fillText("d (微孔直径)", startX - 35, startY - 35);
+            drawArrow(startX, startY + gapY, startX + gapX, startY + gapY, lineMuted);
+            ctx.fillStyle = "#64748B"; ctx.fillText("P (中心距)", startX + gapX/2 - 25, startY + gapY + 20);
+            drawArrow(startX, startY, startX, startY + gapY, lineMuted);
+            ctx.fillText("P", startX - 25, startY + gapY/2 + 5);
+
+        } else if (mode === 'DiamondSquare') {
+            const r = 22;
+            const coords = [[startX, startY + gapY/2], [startX + gapX, startY + gapY/2], [startX + gapX/2, startY], [startX + gapX/2, startY + gapY]];
+            coords.forEach(([cx, cy]) => {
+                ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+                ctx.fillStyle = circleFill; ctx.fill();
+                ctx.strokeStyle = circleLine; ctx.lineWidth = 1.5; ctx.stroke();
+            });
+            drawArrow(startX - 22, startY + gapY/2, startX + 22, startY + gapY/2, accentArrow);
+            ctx.fillStyle = "#1E293B"; ctx.fillText("d", startX - 5, startY + gapY/2 - 30);
+            drawArrow(startX, startY + gapY/2, startX + gapX/2, startY, lineMuted);
+            ctx.fillStyle = "#64748B"; ctx.fillText("P (等边孔心距)", startX + 15, startY + 30);
+
+        } else if (mode === 'DiamondRectangle') {
+            const r = 20;
+            const coords = [[startX, startY], [startX + gapX, startY], [startX + gapX/2, startY + gapY/2], [startX, startY + gapY], [startX + gapX, startY + gapY]];
+            coords.forEach(([cx, cy]) => {
+                ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+                ctx.fillStyle = circleFill; ctx.fill();
+                ctx.strokeStyle = circleLine; ctx.lineWidth = 1.5; ctx.stroke();
+            });
+            drawArrow(startX, startY, startX + gapX, startY, lineMuted);
+            ctx.fillStyle = "#64748B"; ctx.fillText("P1 (水平同排距)", startX + gapX/2 - 40, startY - 20);
+            drawArrow(startX, startY, startX, startY + gapY, lineMuted);
+            ctx.fillText("P2 (跨行垂直距)", startX - 95, startY + gapY/2 + 5);
+            drawArrow(startX + gapX/2 - 20, startY + gapY/2, startX + gapX/2 + 20, startY + gapY/2, accentArrow);
+            ctx.fillStyle = "#1E293B"; ctx.fillText("d", startX + gapX/2 - 4, startY + gapY/2 - 28);
+        }
+    }
+
+    function calculate() {
+        const mode = getSelectedPattern();
+        const d = parseFloat(document.getElementById('input_d').value);
+
+        if (isNaN(d) || d <= 0) {
+            document.getElementById('resultLabel').innerText = "ERROR";
+            return;
+        }
+
+        let rate = 0;
+        try {
+            if (mode === 'Square') {
+                const P = parseFloat(document.getElementById('input_P').value);
+                if (isNaN(P) || P <= 0) throw new Error();
+                rate = (Math.PI * Math.pow(d, 2)) / (4 * Math.pow(P, 2)) * 100;
+            } else if (mode === 'DiamondSquare') {
+                const P = parseFloat(document.getElementById('input_P').value);
+                if (isNaN(P) || P <= 0) throw new Error();
+                rate = (Math.PI * Math.pow(d, 2)) / (2 * Math.pow(P, 2)) * 100;
+            } else if (mode === 'DiamondRectangle') {
+                const P1 = parseFloat(document.getElementById('input_P1').value);
+                const P2 = parseFloat(document.getElementById('input_P2').value);
+                if (isNaN(P1) || P1 <= 0 || !P2 || P2 <= 0) throw new Error();
+                rate = (Math.PI * Math.pow(d, 2)) / (2 * P1 * P2) * 100;
+            }
+            document.getElementById('resultLabel').innerText = `${rate.toFixed(2)} %`;
+        } catch (e) {
+            document.getElementById('resultLabel').innerText = "ERROR";
+        }
+    }
+
+    window.onload = () => {
+        renderSecondaryMenu('materials'); // 默认载入第一个品类
+        updateFields('Square');
+        setTimeout(resizeCanvas, 50);
+    };
+    window.onresize = resizeCanvas;
+</script>
+</body>
+</html>
